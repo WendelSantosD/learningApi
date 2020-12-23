@@ -9,7 +9,7 @@ router.get('/', (req, res, next) => {
 
 router.post('/', (req, res, next) => {
     res.status(201).send({
-        mensage: 'Using POST within the product route'
+        message: 'Using POST within the product route'
     })
 })
 
