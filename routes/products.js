@@ -3,13 +3,18 @@ const router = express.Router()
 
 router.get('/', (req, res, next) => {
     res.status(200).send({
-        message: 'Using GET within the product route'
+        message: 'Returns all products'
     })
 })
 
 router.post('/', (req, res, next) => {
+    const product = {
+        name: req.body.name,
+        price: req.body.price
+    }
     res.status(201).send({
-        message: 'Using POST within the product route'
+        message: 'Insert a product',
+        productCreated: product
     })
 })
 

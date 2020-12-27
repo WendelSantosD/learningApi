@@ -8,8 +8,13 @@ router.get('/', (req, res, next) => {
 })
 
 router.post('/', (req, res, next) => {
+    const request = {
+        id_product: req.body.id_product,
+        amount: req.body.amount
+    }
     res.status(201).send({
-        mensage: 'Request created'
+        mensage: 'Request created',
+        requestCreated: request
     })
 })
 
