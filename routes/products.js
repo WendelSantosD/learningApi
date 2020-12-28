@@ -1,48 +1,137 @@
 const express = require('express')
 const router = express.Router()
+const mysql = require('../mysql').pool
 
 router.get('/', (req, res, next) => {
-    res.status(200).send({
-        message: 'Returns all products'
+    mysql.getConnection((error, conn) => {
+        if (error) {
+            return res.status(500).send({
+            error: error
+            })
+        }
+        conn.query(
+            'SELECT * FROM products;',
+            (error, result, fields) => {
+                if (error) {
+                    return res.status(500).send({
+                    error: error
+                    })
+                }
+                return res.status(200).send({
+                    response: result
+                })
+            }
+        )
     })
 })
 
 router.post('/', (req, res, next) => {
-    const product = {
-        name: req.body.name,
-        price: req.body.price
-    }
-    res.status(201).send({
-        message: 'Insert a product',
-        productCreated: product
+    mysql.getConnection((error, conn) => {
+        if (error) {
+            return res.status(500).send({
+            error: error
+            })
+        }
+        conn.query(
+            'INSERT INTO products (name, price) VALUES (?,?);',
+            [req.body.name, req.body.price],
+            (error, result, field) => {
+                conn.release()
+                if (error) {
+                    return res.status(500).send({
+                    error: error,
+                    response: null
+                })
+                }
+                res.status(201).send({
+                    message: 'Product insert',
+                    id_product: result.insertId
+                })
+            }    
+        )
     })
 })
 
-router.get('/:id_produto', (req, res, next) => {
-    const id = req.params.id_produto
-
-    if(id === 'special') {
-
-        res.status(200).send({
-            message: 'You discovered the ID',
-            id: id
-        })
-    } else {
-        res.status(200).send({
-            message: 'You passed an ID'
-        })
-    }
+router.get('/:id_product', (req, res, next) => {
+    mysql.getConnection((error, conn) => {
+        if (error) {
+            return res.status(500).send({
+                error: error
+            })
+        }
+        conn.query(
+            'SELECT * FROM products WHERE id_product = ?;',
+            [req.params.id_product],
+            (error, result, fields) => {
+                if (error) {
+                    return res.status(500).send({
+                        error: error
+                    })
+                }
+                return res.status(200).send({
+                    response: result
+                })
+            }
+        )
+    })
 })
 
 router.patch('/', (req, res, next) => {
-    res.status(201).send({
-        message: 'Using PATCH within the product route'
+    mysql.getConnection((error, conn) => {
+        if (error) {
+            return res.status(500).send({
+            error: error
+            })
+        }
+        conn.query(
+            `UPDATE     products
+             SET        name        = ?,
+                        price       = ?
+             WHERE      id_product  = ?`,
+            [
+                req.body.name,
+                req.body.price,
+                req.body.id_product
+            ],
+            (error, result, field) => {
+                conn.release()
+                if (error) {
+                    return res.status(500).send({
+                    error: error,
+                    response: null
+                })
+                }
+                res.status(202).send({
+                    message: 'Product altered',
+                })
+            }    
+        )
     })
 })
 
 router.delete('/', (req, res, next) => {
-    res.status(201).send({
-        message: 'Using DELETE within the product route'
+   mysql.getConnection((error, conn) => {
+        if (error) {
+            return res.status(500).send({
+            error: error
+            })
+        }
+        conn.query(
+           `DELETE FROM products WHERE id_product = ?`,
+            [req.body.id_product],
+            (error, result, field) => {
+                conn.release()
+                if (error) {
+                    return res.status(500).send({
+                    error: error,
+                    response: null
+                })
+                }
+                res.status(202).send({
+                    message: 'Product removed',
+                })
+            }    
+        )
     })
 })
 
