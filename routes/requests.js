@@ -9,8 +9,7 @@ router.get('/', (req, res, next) => {
             error: error
             })
         }
-        conn.query(
-            'SELECT * FROM requests;',
+        conn.query('SELECT requests.id_request, requests.amount, products.id_product, products.name, products.price FROM requests INNER JOIN products ON products.id_product = requests.id_request',
             (error, result, fields) => {
                 if (error) {
                     return res.status(500).send({
@@ -18,12 +17,15 @@ router.get('/', (req, res, next) => {
                     })
                 }
                 const response = {
-                    amount: result.length,
                     requests: result.map(orders => {
                         return {
-                            id_request: orders.id_request, 
-                            id_product: orders.id_product,
-                            amount: orders.amount,
+                            id_request: orders.id_request,
+                            amount: orders.amount, 
+                            product: {
+                                 id_product: orders.id_product,
+                                 name: orders.name,
+                                 price: orders.price
+                            },
                             request: {
                                 type: 'GET',
                                 description: 'Return the details of a specific request',
