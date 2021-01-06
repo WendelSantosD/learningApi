@@ -6,6 +6,7 @@ const bodyParser = require('body-parser')
 const productRoute = require('./routes/products')
 const requestRoute = require('./routes/requests')
 
+app.use('/uploads', express.static('uploads'))
 app.use(morgan('dev'))
 app.use(bodyParser.urlencoded({extended: false})) //just simple datas
 app.use(bodyParser.json()) // input json
