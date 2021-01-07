@@ -1,21 +1,10 @@
-const mysql = require('../mysql').pool
+const mysql = require('../mysql')
 
-exports.getProducts = (req, res, next) => {
-    mysql.getConnection((error, conn) => {
-        if (error) {
-            return res.status(500).send({
-            error: error
-            })
-        }
-        conn.query(
-            'SELECT * FROM products',
-            (error, result, fields) => {
-                if (error) {
-                    return res.status(500).send({
-                    error: error
-                    })
-                }
-                const response = {
+
+exports.getProducts = async (req, res, next) => {
+    try {
+        const result = await mysql.execute('SELECT * FROM products')
+        const response = {
                     amount: result.length,
                     products: result.map(prod => {
                         return {
@@ -32,10 +21,48 @@ exports.getProducts = (req, res, next) => {
                     })
                 }
                 return res.status(200).send({response})
-            }
-        )
-    })
+    } catch (error) {
+        console.log(error)
+        return res.status(500).send({error: error})
+    }
 }
+
+// exports.getProducts = (req, res, next) => {
+//     mysql.getConnection((error, conn) => {
+//         if (error) {
+//             return res.status(500).send({
+//             error: error
+//             })
+//         }
+//         conn.query(
+//             'SELECT * FROM products',
+//             (error, result, fields) => {
+//                 if (error) {
+//                     return res.status(500).send({
+//                     error: error
+//                     })
+//                 }
+//                 const response = {
+//                     amount: result.length,
+//                     products: result.map(prod => {
+//                         return {
+//                             id_product: prod.id_product, 
+//                             name: prod.name,
+//                             price: prod.price,
+//                             image_product: prod.image_product,
+//                             request: {
+//                                 type: 'GET',
+//                                 description: 'Return the details of a specific product',
+//                                 url: 'http://localhost:3000/products/' + prod.id_product
+//                             }
+//                         }
+//                     })
+//                 }
+//                 return res.status(200).send({response})
+//             }
+//         )
+//     })
+// }
 
 exports.postProducts = (req, res, next) => {
     console.log(req.file)
